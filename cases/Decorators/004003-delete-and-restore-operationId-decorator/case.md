@@ -1,4 +1,4 @@
-# CASE 004003-delete-and-resore-operationId
+# CASE 004003-delete-and-restore-operationId
 
 ## prompt
 
