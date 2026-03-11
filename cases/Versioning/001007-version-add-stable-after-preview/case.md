@@ -2,7 +2,7 @@
 
 ## prompt
 
-I want to promote my service to stable. Add a new stable version `2025-01-01` to replace the preview version `2024-10-01-preview`. In this new stable version, I also want to add a new property `email` of type `string` to `EmployeeProperties`.
+I want to add a new stable version `2025-01-01`, and the preview changes are not stable.
 
 ### Input Context
 
@@ -171,10 +171,6 @@ model EmployeeProperties {
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
-
-  /** Email of employee */
-  @added(Versions.v2025_01_01)
-  email?: string;
 }
 ```
 
