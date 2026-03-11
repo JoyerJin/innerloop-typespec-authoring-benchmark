@@ -135,7 +135,7 @@ Based on the [Adding a Stable Version when the Last Version was Stable](https://
 
 ### User input
 1. Remove added WorkLocation property, add back removed city property
-3. Add a new property `department` of type `string` to `EmployeeProperties`
+2. Add a new property `department` of type `string` to `EmployeeProperties`
 
 ## result
 
