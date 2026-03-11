@@ -117,7 +117,6 @@ interface Employees {
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
 }
-
 ```
 
 ## user information collection

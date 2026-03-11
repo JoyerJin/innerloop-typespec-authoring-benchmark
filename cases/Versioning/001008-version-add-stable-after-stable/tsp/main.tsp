@@ -37,7 +37,12 @@ model EmployeeProperties {
   age?: int32;
 
   /** City of employee */
+  @removed(Versions.v2024_10_01)
   city?: string;
+
+  /** Work location of employee */
+  @added(Versions.v2024_10_01)
+  workLocation?: WorkLocation;
 
   /** Profile of employee */
   @encode("base64url")
@@ -46,6 +51,22 @@ model EmployeeProperties {
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
+}
+
+/** Work location details */
+@added(Versions.v2024_10_01)
+model WorkLocation {
+  /** Country */
+  country?: string;
+
+  /** City */
+  city?: string;
+
+  /** Company */
+  company?: string;
+
+  /** Seat number */
+  seatNumber?: string;
 }
 
 /** The resource provisioning state. */

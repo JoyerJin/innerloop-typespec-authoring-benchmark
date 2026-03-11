@@ -48,7 +48,12 @@ model EmployeeProperties {
   age?: int32;
 
   /** City of employee */
+  @removed(Versions.v2024_10_01)
   city?: string;
+
+  /** Work location of employee */
+  @added(Versions.v2024_10_01)
+  workLocation?: WorkLocation;
 
   /** Profile of employee */
   @encode("base64url")
@@ -57,6 +62,22 @@ model EmployeeProperties {
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
+}
+
+/** Work location details */
+@added(Versions.v2024_10_01)
+model WorkLocation {
+  /** Country */
+  country?: string;
+
+  /** City */
+  city?: string;
+
+  /** Company */
+  company?: string;
+
+  /** Seat number */
+  seatNumber?: string;
 }
 
 /** The resource provisioning state. */
@@ -118,6 +139,15 @@ Scenario: **Adding a Stable Version when the Last Version was a Stable Version**
 
 1. Add the new stable version `2025-01-01` to the `Versions` enum
 
+2. Create a new examples folder for the new version `examples/2025-01-01` and populate it with examples.
+
+3. For each change the user identifies:
+   - If a type/property is removed, add `@removed(Versions.v2025_01_01)` decorator.
+   - If a type/property is added, add `@added(Versions.v2025_01_01)` decorator.
+   - If a type/property is renamed, add `@renamedFrom(Versions.v2025_01_01, "oldName")` decorator.
+   - If a property type changed, add `@typeChangedFrom(Versions.v2025_01_01, OldType)` decorator.
+   - If a property is made optional, add `@madeOptional(Versions.v2025_01_01)` decorator.
+
 ```tsp
 /** The available API versions. */
 enum Versions {
@@ -155,15 +185,6 @@ model EmployeeProperties {
   department?: string;
 }
 ```
-
-2. Create a new examples folder for the new version `examples/2025-01-01` and populate it with examples.
-
-3. For each change the user identifies:
-   - If a type/property is removed, add `@removed(Versions.v2025_01_01)` decorator.
-   - If a type/property is added, add `@added(Versions.v2025_01_01)` decorator.
-   - If a type/property is renamed, add `@renamedFrom(Versions.v2025_01_01, "oldName")` decorator.
-   - If a property type changed, add `@typeChangedFrom(Versions.v2025_01_01, OldType)` decorator.
-   - If a property is made optional, add `@madeOptional(Versions.v2025_01_01)` decorator.
 
 ## Reference
 - https://azure.github.io/typespec-azure/docs/howtos/versioning/arm/05-stable-after-stable/
