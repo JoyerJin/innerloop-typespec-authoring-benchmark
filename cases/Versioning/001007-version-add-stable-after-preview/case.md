@@ -155,7 +155,21 @@ enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2025_01_01: "2025-01-01",
 }
+```
 
+2. Rename example folder from the old preview to the new stable version (e.g., `mv examples/2024-10-01-preview examples/2025-01-01`), update the `api-version` parameter in all example files, and add or modify examples to reflect API changes.
+
+3. For each preview change the user identifies:
+   - For preview changes that ARE now stable: update the versioning decorator to reference the new stable version (e.g., `@added(Versions.v2024_10_01_preview)` → `@added(Versions.v2025_01_01)`).
+   - For preview changes that are NOT stable:
+     - `@added`: Delete the type/property entirely.
+     - `@typeChangedFrom`: Revert the property to its old type, remove the decorator.
+     - `@returnTypeChangedFrom`: Revert the return type, remove the decorator.
+     - `@renamedFrom`: Revert to the old name, remove the decorator.
+     - `@madeOptional`: Make the property required again, remove the decorator.
+     - `@removed`: Remove the decorator (restoring the type).
+
+```tsp
 /** Employee properties */
 model EmployeeProperties {
   /** Age of employee */
@@ -173,18 +187,6 @@ model EmployeeProperties {
   provisioningState?: ProvisioningState;
 }
 ```
-
-2. Rename example folder from the old preview to the new stable version (e.g., `mv examples/2024-10-01-preview examples/2025-01-01`), update the `api-version` parameter in all example files, and add or modify examples to reflect API changes.
-
-3. For each preview change the user identifies:
-   - For preview changes that ARE now stable: update the versioning decorator to reference the new stable version (e.g., `@added(Versions.v2024_10_01_preview)` → `@added(Versions.v2025_01_01)`).
-   - For preview changes that are NOT stable:
-     - `@added`: Delete the type/property entirely.
-     - `@typeChangedFrom`: Revert the property to its old type, remove the decorator.
-     - `@returnTypeChangedFrom`: Revert the return type, remove the decorator.
-     - `@renamedFrom`: Revert to the old name, remove the decorator.
-     - `@madeOptional`: Make the property required again, remove the decorator.
-     - `@removed`: Remove the decorator (restoring the type).
 
 ## Reference
 - https://azure.github.io/typespec-azure/docs/howtos/versioning/arm/03-stable-after-preview/
