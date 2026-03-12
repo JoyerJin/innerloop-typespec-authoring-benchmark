@@ -34,11 +34,16 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
+  /** Age of employee (before 2025-11-01) */
+  @removed(Versions.v2024_10_01_preview)
+  @renamedFrom(Versions.v2024_10_01_preview, "age")
+  oldAge?: int32;
+
+  /** Age of employee (from 2025-11-01 onward, default is 21) */
+  @added(Versions.v2024_10_01_preview)
+  age?: int32 = 21;
 
   /** City of employee */
-  @removed(Versions.v2024_10_01_preview)
   city?: string;
 
   /** Work location of employee */
@@ -59,9 +64,6 @@ model EmployeeProperties {
 model WorkLocation {
   /** Country */
   country?: string;
-
-  /** City */
-  city?: string;
 
   /** Company */
   company?: string;
