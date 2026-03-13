@@ -20,22 +20,6 @@ innerloop-typespec-authoring-benchmark/
         └── typespec_*.md          # Weekly discussion snapshots
 ```
 
-
-## Case Category
-
-| Category | Code | # Cases | Sample Prompts |
-|----------|------|---------|----------------|
-| Versioning | 001 | 8 | _"Add a new preview version `2025-05-04-preview` to my service."_ / _"Change the property age from required to optional for new api version."_ |
-| ARM Template | 002 | 8 | _"Define a Azure resource 'User' under the namespace 'Microsoft.Contoso' using TypeSpec."_ / _"Add an additional POST action called '/notify' to the standard operations of User."_ |
-| Long Running Operation (LRO) | 003 | 3 | _"Add an async delete operation for StacItems."_ / _"Add a move async operation to move employee."_ |
-| Decorators | 004 | 3 | _"Add minLength decorator to set the minLength 1 for resource name parameter."_ / _"Add @minLength(3) @maxLength(10) constrains for any item of assets array."_ |
-| Warning | 005 | 1 | _"Add suppressions for the warnings produced by 'tsp compile .'"_ |
-| Operations | 006 | 0 | — |
-| Patch | 007 | 0 | — |
-| Paging | 008 | 0 | — |
-
-Test case name convention: `<category-code><case-number>-<case name>`
-
 ## Case Summary
 
 ### Versioning (8 cases)
