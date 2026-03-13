@@ -128,21 +128,16 @@ Based on the [General Case: One or more Stable Versions Exist](https://azure.git
 
 ### 1. Any types or properties that were `@added` in the previous preview should be removed in the new preview
 - agent behavior: Ask the user whether any types or properties that were `@added` in the previous preview should be removed in the new preview.
-- user input: Which types/properties to remove. 
+- user input: Remove added age property
 
 ### 2. Any types or properties that were `@removed` in the previous preview should now appear in the new preview
 - agent behavior: Ask the user whether any types or properties that were `@removed` in the previous preview should now appear in the new preview.
-- user input: Which types/properties to restore. 
+- user input: Add back removed oldAge property
 
 ### 3. Any renames, type changes, or optional changes from the previous preview that should be reverted?
 
 - agent behavior: Ask the user whether any decorator-based changes from the previous preview (`@renamedFrom`, `@typeChangedFrom`, `@madeOptional`) should be reversed in the new preview.
-- user input: Which changes to revert. 
-
-### User input
-1. Remove added WorkLocation property
-2. Add back removed city property
-3. Add email into employee
+- user input: oldAge renamedFrom should be reverted
 
 ## result
 
@@ -180,6 +175,10 @@ model EmployeeProperties {
   /** City of employee */
   city?: string;
 
+  /** Email of employee */
+  @added(Versions.v2025_05_04_preview)
+  workLocation?: WorkLocation;
+
   /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
@@ -187,10 +186,6 @@ model EmployeeProperties {
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
-
-  /** Email of employee */
-  @added(Versions.v2025_05_04_preview)
-  email?: string;
 }
 ```
 

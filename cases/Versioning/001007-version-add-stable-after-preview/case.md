@@ -128,23 +128,13 @@ Based on the [Adding a Stable Version when the Last Version was Preview](https:/
 
 ### 1. Which type changes from the latest preview are now stable?
 
-- agent behavior: Ask the user which types, properties, or changes introduced in the latest preview version should be carried forward into the new stable version.
-- user input: Which preview changes are now stable. Update their versioning decorators to reference the new stable version instead of the preview version.
+- agent behavior: Which of these preview features should be carried over to the new stable version `2025-01-01`? Should all 4 be included, or should any be excluded?
+- user input: Let me specify which to include/exclude
 
 ### 2. Which changes from the latest preview are NOT in the new stable version?
 
-- agent behavior: Ask the user which types, properties, or changes from the latest preview should NOT appear in the new stable version.
-- user input: Which preview changes to revert.
-
-### 3. Any additional changes in the new stable version?
-
-- agent behavior: Ask the user whether there are any additional types, properties, or modifications to introduce in the new stable version beyond what was in the preview.
-- user input: Which new changes to introduce. Mark each with the appropriate versioning decorator referencing the new stable version.
-
-### User Input for test
-1. model WorkLocation is stable
-2. city removal is not stable
-3. city property in WorkLocation will be removed
+- agent behavior: Which features should be **excluded** from the stable version `2025-01-01`? Select all that should NOT carry over.
+- user input: Exclude `workLocation` property and `WorkLocation` model
 
 ## result
 
@@ -180,15 +170,17 @@ enum Versions {
 ```tsp
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
+  /** Age of employee (before 2025-11-01) */
+  @removed(Versions.v2025_01_01)
+  @renamedFrom(Versions.v2025_01_01, "age")
+  oldAge?: int32;
+
+  /** Age of employee (from 2025-11-01 onward, default is 21) */
+  @added(Versions.v2025_01_01)
+  age?: int32 = 21;
 
   /** City of employee */
   city?: string;
-
-  /** Work location of employee */
-  @added(Versions.v2025_01_01)
-  workLocation?: WorkLocation;
 
   /** Profile of employee */
   @encode("base64url")
@@ -197,19 +189,6 @@ model EmployeeProperties {
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
-}
-
-/** Work location details */
-@added(Versions.v2025_01_01)
-model WorkLocation {
-  /** Country */
-  country?: string;
-
-  /** Company */
-  company?: string;
-
-  /** Seat number */
-  seatNumber?: string;
 }
 ```
 

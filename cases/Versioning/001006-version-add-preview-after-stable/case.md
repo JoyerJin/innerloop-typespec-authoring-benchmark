@@ -128,16 +128,12 @@ Based on the [Adding a Preview Version when the Last Version was Stable](https:/
 ### 1. Any types removed in the new preview?
 
 - agent behavior: Ask the user whether any existing types or properties should be removed in the new preview version.
-- user input: Which types/properties to remove. Mark each with an `@removed` decorator referencing the new preview version.
+- user input: I want to add/modify/remove features
 
 ### 2. Any types added, renamed, or otherwise modified in the new preview?
 
 - agent behavior: Ask the user what new types, properties, renames, or other modifications should be introduced in the new preview version.
-- user input: Which changes to introduce. Mark each with the appropriate versioning decorator (`@added`, `@renamedFrom`, `@typeChangedFrom`, `@madeOptional`) referencing the new preview version.
-
-### User input
-1. I want to add/modify/remove features
-2. Add a new property `department` of type `string` to `EmployeeProperties`.
+- user input: Add a new property `department` of type `string` to `EmployeeProperties`.
 
 ## result
 

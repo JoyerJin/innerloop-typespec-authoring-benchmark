@@ -125,19 +125,14 @@ interface Employees {
 
 Based on the [Adding a Stable Version when the Last Version was Stable](https://azure.github.io/typespec-azure/docs/howtos/versioning/arm/05-stable-after-stable/) guide:
 
-### 1. Any types removed in the new stable version?
-
-- agent behavior: Ask the user whether any existing types or properties should be removed in the new stable version.
-- user input: Which types/properties to remove. Mark each with an `@removed` decorator referencing the new stable version.
-
-### 2. Any types added, renamed, or otherwise modified in the new stable version?
-
-- agent behavior: Ask the user what new types, properties, renames, or other modifications should be introduced in the new stable version.
-- user input: Which changes to introduce. Mark each with the appropriate versioning decorator (`@added`, `@renamedFrom`, `@typeChangedFrom`, `@madeOptional`) referencing the new stable version.
-
-### User input
-1. Remove added WorkLocation property, add back removed city property
-2. Add a new property `department` of type `string` to `EmployeeProperties`
+- agent behavior: - Goal: Add stable version 2025-01-01 to 001008 project with new department property
+│  - File: 001008-version-add-stable-after-stable/tsp/main.tsp
+│  - Steps:
+│  1. Add v2025_01_01 entry to Versions enum
+│  2. Add department?: string with @added(Versions.v2025_01_01) to EmployeeProperties
+│  3. Run TypeSpec validation
+│  - Result: department only appears in 2025-01-01; all existing features carried forward
+- user input: Accept plan and build on autopilot (recommended)
 
 ## result
 
@@ -172,11 +167,25 @@ enum Versions {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
+  /** Age of employee (before 2025-11-01) */
+  @removed(Versions.v2024_10_01)
+  @renamedFrom(Versions.v2024_10_01, "age")
+  oldAge?: int32;
+
+  /** Age of employee (from 2025-11-01 onward, default is 21) */
+  @added(Versions.v2024_10_01)
+  age?: int32 = 21;
 
   /** City of employee */
   city?: string;
+
+  /** Work location of employee */
+  @added(Versions.v2024_10_01)
+  workLocation?: WorkLocation;
+
+  /** Department of employee */
+  @added(Versions.v2025_01_01)
+  department?: string;
 
   /** Profile of employee */
   @encode("base64url")
@@ -185,10 +194,19 @@ model EmployeeProperties {
   /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
+}
 
-  /** Department of employee */
-  @added(Versions.v2025_01_01)
-  department?: string;
+/** Work location details */
+@added(Versions.v2024_10_01)
+model WorkLocation {
+  /** Country */
+  country?: string;
+
+  /** Company */
+  company?: string;
+
+  /** Seat number */
+  seatNumber?: string;
 }
 ```
 
