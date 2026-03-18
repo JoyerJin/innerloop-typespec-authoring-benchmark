@@ -3,85 +3,29 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "./employee.tsp";
 
-using Http;
-using Rest;
-using Versioning;
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
-/** Contoso Resource Provider management API. */
+/** Microsoft.Widget Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
-@versioned(Versions)
-namespace Microsoft.ContosoProviderHub;
+@service(#{ title: "Widget" })
+@versioned(Microsoft.Widget.Versions)
+namespace Microsoft.Widget;
 
-/** Contoso API versions */
+/** The available API versions. */
 enum Versions {
   /** 2021-10-01-preview version */
-  // @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  `2021-10-01-preview`,
+  v2021_10_01_preview: "2021-10-01-preview",
 
-  /** 2021-10-01-preview version */
-  // @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  /** 2021-11-01 version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  `2024-10-01-preview`,
-
-  /** 2025-05-04-preview version */
-  // @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  `2025-05-04-preview`,
+  v2021_11_01: "2021-11-01",
 }
 
-/** Employee resource */
-model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
-}
-
-/** Employee properties */
-model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
-
-  /** City of employee */
-  city?: string;
-
-  /** Profile of employee */
-  @encode("base64url")
-  profile?: bytes;
-
-  /** The status of the last operation. */
-  @visibility(Lifecycle.Read)
-  provisioningState?: ProvisioningState;
-}
-
-/** The resource provisioning state. */
-@lroStatus
-union ProvisioningState {
-  ResourceProvisioningState,
-
-  /** The resource is being provisioned */
-  Provisioning: "Provisioning",
-
-  /** The resource is updating */
-  Updating: "Updating",
-
-  /** The resource is being deleted */
-  Deleting: "Deleting",
-
-  /** The resource create request has been accepted */
-  Accepted: "Accepted",
-
-  string,
-}
-
-@armResourceOperations
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
-  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
-  listByResourceGroup is ArmResourceListByParent<Employee>;
-  listBySubscription is ArmListBySubscription<Employee>;
-}
+interface Operations extends Azure.ResourceManager.Operations {}

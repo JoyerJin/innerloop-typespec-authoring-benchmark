@@ -4,157 +4,75 @@ Some resources will provide more than the standard CRUD operations and will need
 
 ## Prompt
 
-Add an additional POST action called "/notify" to the standard operations of User. Ensure the definition meets TypeSpec Azure design guidelines.
+Add an additional POST action called "/notify" to the standard operations of Employee. Ensure the definition meets TypeSpec Azure design guidelines.
 
 ### Input context
 
 ```tsp
-//user.tsp
-import "@typespec/http";
+//Employee.tsp
 import "@typespec/rest";
-import "@typespec/versioning";
+import "@typespec/http";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using Http;
-using Rest;
-using Versioning;
+using TypeSpec.Rest;
+using TypeSpec.Http;
 using Azure.Core;
 using Azure.ResourceManager;
 
-/** Contoso Resource Provider management API. */
-@armProviderNamespace
-@service(#{ title: "ContosoManagementClient" })
-@versioned(Versions)
-namespace Microsoft.Contoso;
+namespace Microsoft.Widget;
 
-/** Contoso API versions */
-enum Versions {
-	/** 2025-12-01-preview version */
-	@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-	`2025-12-01-preview`,
+/** Employee resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 
-/** A Contoso User resource. */
-model User is TrackedResource<UserProperties> {
-	...ResourceNameParameter<User>;
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
 }
 
-/** Properties of the Contoso User resource. */
-model UserProperties {
-	/** Display name of the user. */
-	displayName?: string;
-
-	/** Email of the user. */
-	email?: string;
-
-	/** Assigned roles for the user. */
-	roles?: string[];
-
-	/** The status of the last operation. */
-	@visibility(Lifecycle.Read)
-	provisioningState?: ProvisioningState;
-}
-
-/** The provisioning state of a resource. */
+/** The resource provisioning state. */
 @lroStatus
 union ProvisioningState {
-	string,
+  ResourceProvisioningState,
 
-	/** The resource create request has been accepted */
-	Accepted: "Accepted",
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
 
-	/** The resource is being provisioned */
-	Provisioning: "Provisioning",
+  /** The resource is updating */
+  Updating: "Updating",
 
-	/** The resource is updating */
-	Updating: "Updating",
+  /** The resource is being deleted */
+  Deleting: "Deleting",
 
-	/** Resource has been created. */
-	Succeeded: "Succeeded",
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
 
-	/** Resource creation failed. */
-	Failed: "Failed",
-
-	/** Resource creation was canceled. */
-	Canceled: "Canceled",
-
-	/** The resource is being deleted */
-	Deleting: "Deleting",
+  string,
 }
 
-/** Operations for Contoso User resources. */
 @armResourceOperations
-interface Users {
-	/** Gets a User resource. */
-	get is ArmResourceRead<User>;
-
-	/** Creates or updates a User resource. */
-	createOrUpdate is ArmResourceCreateOrReplaceAsync<User>;
-
-	/** Patches a User resource. */
-	update is ArmResourcePatchSync<User, UserProperties>;
-
-	/** Deletes a User resource. */
-	delete is ArmResourceDeleteWithoutOkAsync<User>;
-
-	/** Lists User resources in a resource group. */
-	listByResourceGroup is ArmResourceListByParent<User>;
-
-	/** Lists User resources in a subscription. */
-	listBySubscription is ArmListBySubscription<User>;
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
 }
-
-/** A Contoso Address resource. */
-@parentResource(User)
-model Address is ProxyResource<AddressProperties> {
-	...ResourceNameParameter<Address>;
-}
-
-/** Properties of the Contoso Address resource. */
-model AddressProperties {
-	/** Street address line 1. */
-	street1?: string;
-
-	/** Street address line 2. */
-	street2?: string;
-
-	/** City name. */
-	city?: string;
-
-	/** State or province name. */
-	state?: string;
-
-	/** Postal or ZIP code. */
-	postalCode?: string;
-
-	/** Country name. */
-	country?: string;
-
-	/** The status of the last operation. */
-	@visibility(Lifecycle.Read)
-	provisioningState?: ProvisioningState;
-}
-
-/** Operations for Contoso Address resources. */
-@armResourceOperations
-interface Addresses {
-	/** Gets an Address resource. */
-	get is ArmResourceRead<Address>;
-
-	/** Creates or updates an Address resource. */
-	createOrUpdate is ArmResourceCreateOrReplaceAsync<Address>;
-
-	/** Patches an Address resource. */
-	update is ArmResourcePatchSync<Address, AddressProperties>;
-
-	/** Deletes an Address resource. */
-	delete is ArmResourceDeleteWithoutOkAsync<Address>;
-
-	/** Lists Address resources for a User. */
-	listByParent is ArmResourceListByParent<Address>;
-}
-
 ```
 
 ## Expected response
@@ -162,50 +80,59 @@ interface Addresses {
 Additional resource operations can be added to the interface where you defined standard resource operations, using the ArmResourceAction templates.
 
 ```tsp
-/** Request body for the notify action. */
-model NotifyRequest {
-	/** The notification message to send. */
-	message: string;
+union NotificationPriority {
+  string,
 
-	/** The notification priority. */
-	priority?: "low" | "medium" | "high";
+  /** Low priority */
+  Low: "Low",
+
+  /** Normal priority */
+  Normal: "Normal",
+
+  /** High priority */
+  High: "High",
+
+  /** Critical priority */
+  Critical: "Critical",
 }
 
-/** Response for the notify action. */
-model NotifyResponse {
-	/** Indicates whether the notification was sent successfully. */
-	success: boolean;
+/** The details of an employee notification. */
+model NotificationRequest {
+  /** The notification message. */
+  message: string;
 
-	/** Additional message about the notification status. */
-	@visibility(Lifecycle.Read)
-	statusMessage?: string;
+  /** The priority of the notification. */
+  priority: NotificationPriority;
 }
 
-/** Operations for Contoso User resources. */
+/** The result of a notification operation. */
+model NotificationResponse {
+  /** The unique identifier of the notification. */
+  notificationId: string;
+
+  /** The status of the notification. */
+  status: string;
+}
+
 @armResourceOperations
-interface Users {
-	/** Gets a User resource. */
-	get is ArmResourceRead<User>;
-
-	/** Creates or updates a User resource. */
-	createOrUpdate is ArmResourceCreateOrReplaceAsync<User>;
-
-	/** Patches a User resource. */
-	update is ArmResourcePatchSync<User, UserProperties>;
-
-	/** Deletes a User resource. */
-	delete is ArmResourceDeleteWithoutOkAsync<User>;
-
-	/** Lists User resources in a resource group. */
-	listByResourceGroup is ArmResourceListByParent<User>;
-
-	/** Lists User resources in a subscription. */
-	listBySubscription is ArmListBySubscription<User>;
-
-	/** Sends a notification to the User resource. */
-	notify is ArmResourceActionSync<User, NotifyRequest, NotifyResponse>;
+interface Employees {
+	get is ArmResourceRead<Employee>;
+	createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+	update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+	delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+	listByResourceGroup is ArmResourceListByParent<Employee>;
+	listBySubscription is ArmListBySubscription<Employee>;
+	notify is ArmResourceActionSync<Employee, NotifyRequest, NotifyResponse>;
 }
 ```
+
+## Verify Plan
+1. Add new union NotificationPriority, extensible enum with Low, Normal, High, Critical.
+2. Add new model NotificationRequest with properties message: string, priority: NotificationPriority.
+3. Add new model NotificationResponse with properties notificationId: string, status: string.
+4. Add new operation in Employees interface:
+	notify is ArmResourceActionSync<Employee, NotificationRequest, NotificationResponse>;
+5. Create example files for both API versions (2021-10-01-preview, 2021-11-01).
 
 ## Case reference
 

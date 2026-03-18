@@ -2,122 +2,25 @@
 
 ## Prompt
 
-Define a "badge assignment" extension resource. It should be an extension resouce that can be attached to an employee. Ensure the definition meets TypeSpec Azure guidelines.
+Define a "badge assignment" extension resource. It should be an extension resource that can be attached to an employee. Ensure the definition meets TypeSpec Azure guidelines.
 
 ### Input context
 
 <https://github.com/Azure/azure-rest-api-specs-pr/pull/25670>
+<https://github.com/haolingdong-msft/innerloop-typespec-authoring-benchmark/tree/main/cases/ARMTemplate/002004-ARM-define-extension-resource/tsp/badgeAssignment.tsp>
 
 ```tsp
-import "@typespec/http";
 import "@typespec/rest";
-import "@typespec/versioning";
+import "@typespec/http";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using Http;
-using Rest;
-using Versioning;
+using TypeSpec.Rest;
+using TypeSpec.Http;
 using Azure.Core;
 using Azure.ResourceManager;
 
-/** Contoso Resource Provider management API. */
-@armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
-@versioned(Versions)
-namespace Microsoft.ContosoProviderHub;
-
-/** Contoso API versions */
-enum Versions {
-  /** 2021-10-01-preview version */
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  `2021-10-01-preview`,
-}
-
-/** A ContosoProviderHub resource */
-model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee>;
-}
-
-/** Employee properties */
-model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
-
-  /** City of employee */
-  city?: string;
-
-  /** Profile of employee */
-  @encode("base64url")
-  profile?: bytes;
-
-  /** The status of the last operation. */
-  @visibility(Lifecycle.Read)
-  provisioningState?: ProvisioningState;
-}
-
-/** The provisioning state of a resource. */
-@lroStatus
-union ProvisioningState {
-  string,
-
-  /** The resource create request has been accepted */
-  Accepted: "Accepted",
-
-  /** The resource is being provisioned */
-  Provisioning: "Provisioning",
-
-  /** The resource is updating */
-  Updating: "Updating",
-
-  /** Resource has been created. */
-  Succeeded: "Succeeded",
-
-  /** Resource creation failed. */
-  Failed: "Failed",
-
-  /** Resource creation was canceled. */
-  Canceled: "Canceled",
-
-  /** The resource is being deleted */
-  Deleting: "Deleting",
-}
-
-/** Employee move request */
-model MoveRequest {
-  /** The moving from location */
-  from: string;
-
-  /** The moving to location */
-  to: string;
-}
-
-/** Employee move response */
-model MoveResponse {
-  /** The status of the move */
-  movingStatus: string;
-}
-
-interface Operations extends Azure.ResourceManager.Operations {}
-
-@armResourceOperations
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-  update is ArmCustomPatchAsync<
-    Employee,
-    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
-  >;
-  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
-  listByResourceGroup is ArmResourceListByParent<Employee>;
-  listBySubscription is ArmListBySubscription<Employee>;
-
-  /** A sample resource action that move employee to different location */
-  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
-
-  /** A sample HEAD operation to check resource existence */
-  checkExistence is ArmResourceCheckExistence<Employee>;
-}
+namespace Microsoft.Widget;
 
 /** Badge assignment extension resource */
 model BadgeAssignment is ProxyResource<BadgeAssignmentProperties> {
@@ -152,38 +55,58 @@ interface BadgeAssignments {
 
 ## Expected response
 
-
 ```tsp
-/** Badge assignment extension resource */
-model BadgeAssignment is ExtensionResource<BadgeAssignmentProperties> {
-  ...ResourceNameParameter<BadgeAssignment>;
-}
+import "@azure-tools/typespec-azure-resource-manager";
 
-/** Badge assignment properties */
+using Azure.ResourceManager;
+
+namespace Microsoft.Widget;
+
+/** Badge assignment properties. */
 model BadgeAssignmentProperties {
-  /** Identifier of the badge. */
+  /** The unique identifier of the badge. */
   badgeId: string;
 
-  /** The date when the badge was assigned. */
+  /** The date the badge was assigned. */
   assignedDate?: plainDate;
 
-  /** Indicates whether the badge assignment is active. */
+  /** Indicates whether the badge assignment is currently active. */
   isActive?: boolean;
 
-  /** The status of the last operation. */
+  /** The status of the last provisioning operation performed on the badge assignment. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-@armResourceOperations
-interface BadgeAssignments {
-  get is ArmResourceRead<BadgeAssignment>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<BadgeAssignment>;
-  update is ArmResourcePatchSync<BadgeAssignment, BadgeAssignmentProperties>;
-  delete is ArmResourceDeleteWithoutOkAsync<BadgeAssignment>;
-  listByParent is ArmResourceListByParent<BadgeAssignment>;
+/** A badge assignment extension resource attached to an employee. */
+model BadgeAssignment is ExtensionResource<BadgeAssignmentProperties> {
+  ...ResourceNameParameter<BadgeAssignment>;
 }
+
+/** Badge assignment operations scoped to a target resource. */
+interface BadgeAssignmentOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
+  /** Get a badge assignment. */
+  get is Azure.ResourceManager.Extension.Read<Scope, BadgeAssignment>;
+  /** Create or update a badge assignment. */
+  createOrUpdate is Azure.ResourceManager.Extension.CreateOrReplaceAsync<Scope, BadgeAssignment>;
+  /** Update a badge assignment. */
+  update is Azure.ResourceManager.Extension.CustomPatchAsync<Scope, BadgeAssignment>;
+  /** Delete a badge assignment. */
+  delete is Azure.ResourceManager.Extension.DeleteWithoutOkAsync<Scope, BadgeAssignment>;
+  /** List badge assignments by target resource. */
+  list is Azure.ResourceManager.Extension.ListByTarget<Scope, BadgeAssignment>;
+}
+
+/** Badge assignment operations on employee resources. */
+@armResourceOperations
+interface EmployeeBadgeAssignments extends BadgeAssignmentOps<Employee> {}
 ```
+
+## Verify Plan
+1. Define BadgeAssignment as a proper ARM extension resource attached to Employee.
+2. Replaced ArmResource* with Extension.* templates (Read, CreateOrReplaceAsync, CustomPatchAsync, DeleteWithoutOkAsync, ListByTarget) scoped to Employee.
+3. Interface pattern: Generic BadgeAssignmentOps<Scope> bound to Employee via @armResourceOperations interface EmployeeBadgeAssignments extends BadgeAssignmentOps<Employee>.
+4. Properties are unchanged.
 
 ## Case reference
 

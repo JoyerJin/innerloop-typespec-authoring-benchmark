@@ -1,109 +1,76 @@
 # CASE 002006-ARM-define-child-resource
 ## Prompt
 
-Create a new "AddressResource" child resource under the parent resource "user". Ensure the definition meets TypeSpec Azure design guidelines.
+Create a new "AddressResource" child resource under the parent resource "Employee". Ensure the definition meets TypeSpec Azure design guidelines.
 
 ### Input context
 
 ```tsp
-//user.tsp
+//Employee.tsp
 
-import "@typespec/http";
 import "@typespec/rest";
-import "@typespec/versioning";
+import "@typespec/http";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using Http;
-using Rest;
-using Versioning;
+using TypeSpec.Rest;
+using TypeSpec.Http;
 using Azure.Core;
 using Azure.ResourceManager;
 
-/** Contoso Resource Provider management API. */
-@armProviderNamespace
-@service(#{ title: "ContosoManagementClient" })
-@versioned(Versions)
-namespace Microsoft.Contoso;
+namespace Microsoft.Widget;
 
-/** Contoso API versions */
-enum Versions {
-	/** 2025-12-01-preview version */
-	@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-	`2025-12-01-preview`,
+/** Employee resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 
-/** A Contoso User resource. */
-model User is TrackedResource<UserProperties> {
-	...ResourceNameParameter<User>;
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
 }
 
-/** Properties of the Contoso User resource. */
-model UserProperties {
-	/** Display name of the user. */
-	displayName?: string;
-
-	/** Email of the user. */
-	email?: string;
-
-	/** Assigned roles for the user. */
-	roles?: string[];
-
-	/** The status of the last operation. */
-	@visibility(Lifecycle.Read)
-	provisioningState?: ProvisioningState;
-}
-
-/** The provisioning state of a resource. */
+/** The resource provisioning state. */
 @lroStatus
 union ProvisioningState {
-	string,
+  ResourceProvisioningState,
 
-	/** The resource create request has been accepted */
-	Accepted: "Accepted",
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
 
-	/** The resource is being provisioned */
-	Provisioning: "Provisioning",
+  /** The resource is updating */
+  Updating: "Updating",
 
-	/** The resource is updating */
-	Updating: "Updating",
+  /** The resource is being deleted */
+  Deleting: "Deleting",
 
-	/** Resource has been created. */
-	Succeeded: "Succeeded",
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
 
-	/** Resource creation failed. */
-	Failed: "Failed",
-
-	/** Resource creation was canceled. */
-	Canceled: "Canceled",
-
-	/** The resource is being deleted */
-	Deleting: "Deleting",
+  string,
 }
 
-/** Operations for Contoso User resources. */
 @armResourceOperations
-interface Users {
-	/** Gets a User resource. */
-	get is ArmResourceRead<User>;
-
-	/** Creates or updates a User resource. */
-	createOrUpdate is ArmResourceCreateOrReplaceAsync<User>;
-
-	/** Patches a User resource. */
-	update is ArmResourcePatchSync<User, UserProperties>;
-
-	/** Deletes a User resource. */
-	delete is ArmResourceDeleteWithoutOkAsync<User>;
-
-	/** Lists User resources in a resource group. */
-	listByResourceGroup is ArmResourceListByParent<User>;
-
-	/** Lists User resources in a subscription. */
-	listBySubscription is ArmListBySubscription<User>;
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
 }
-
-
 ```
 
 ## Expected response
@@ -111,57 +78,65 @@ interface Users {
 You can create parent/child relationships between resource types by using the @parentResource decorator when defining a resource type.
 
 ```tsp
-/** A Contoso Address resource. */
-@parentResource(User)
-model Address is ProxyResource<AddressProperties> {
-	...ResourceNameParameter<Address>;
+//address.tsp
+import "@typespec/rest";
+import "@typespec/http";
+import "@azure-tools/typespec-azure-core";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Rest;
+using TypeSpec.Http;
+using Azure.Core;
+using Azure.ResourceManager;
+
+namespace Microsoft.Widget;
+
+/** Address resource belonging to an employee */
+@parentResource(Employee)
+model AddressResource is ProxyResource<AddressProperties> {
+  ...ResourceNameParameter<AddressResource>;
 }
 
-/** Properties of the Contoso Address resource. */
+/** Address properties */
 model AddressProperties {
-	/** Street address line 1. */
-	street1?: string;
+  /** Street address line 1 */
+  street1?: string;
 
-	/** Street address line 2. */
-	street2?: string;
+  /** Street address line 2 */
+  street2?: string;
 
-	/** City name. */
-	city?: string;
+  /** City */
+  city?: string;
 
-	/** State or province name. */
-	state?: string;
+  /** State or province */
+  state?: string;
 
-	/** Postal or ZIP code. */
-	postalCode?: string;
+  /** Postal code */
+  postalCode?: string;
 
-	/** Country name. */
-	country?: string;
+  /** Country or region */
+  country?: string;
 
-	/** The status of the last operation. */
-	@visibility(Lifecycle.Read)
-	provisioningState?: ProvisioningState;
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
 }
 
-/** Operations for Contoso Address resources. */
 @armResourceOperations
 interface Addresses {
-	/** Gets an Address resource. */
-	get is ArmResourceRead<Address>;
-
-	/** Creates or updates an Address resource. */
-	createOrUpdate is ArmResourceCreateOrReplaceAsync<Address>;
-
-	/** Patches an Address resource. */
-	update is ArmResourcePatchSync<Address, AddressProperties>;
-
-	/** Deletes an Address resource. */
-	delete is ArmResourceDeleteWithoutOkAsync<Address>;
-
-	/** Lists Address resources for a User. */
-	listByParent is ArmResourceListByParent<Address>;
+  get is ArmResourceRead<AddressResource>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<AddressResource>;
+  update is ArmResourcePatchSync<AddressResource, AddressProperties>;
+  delete is ArmResourceDeleteWithoutOkAsync<AddressResource>;
+  listByParent is ArmResourceListByParent<AddressResource>;
 }
-
 ```
+
+## Verify Plan
+1. create new file address.tsp.
+2. Add new model AddressResource is ProxyResource with @parentResource(Employee) decorator.
+3. Add new model AddressProperties with 6 optional properties (street1, street2, city, state, postalCode, country) plus read-only provisioningState.
+4. Add Addresses interface operations: get, createOrUpdate (async), update (sync patch), delete (async), listByParent.
 
 ## Case reference
 

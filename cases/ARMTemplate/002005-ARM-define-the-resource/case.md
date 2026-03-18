@@ -2,120 +2,102 @@
 
 An ARM resource provider is composed of resources. There are three essential components of a resource defined with TypeSpec:
 - A model type representing the resource
-- A model type defining the propoerties of the resource type
-- An interface that defines the operations that can be performed on the resource type, usually a combination of recommended and required operations and resrouce actions
+- A model type defining the properties of the resource type
+- An interface that defines the operations that can be performed on the resource type, usually a combination of recommended and required operations and resource actions
 
 ## Prompt
 
-Define a Azure resource "User" under the namespace "Microsoft.Contoso" using TypeSpec. Ensure the definition meets TypeSpec Azure design guidelines.
+Define a Azure resource "Employee" under the namespace "Microsoft.Widget" using TypeSpec. Ensure the definition meets TypeSpec Azure design guidelines.
 
 ### Input context
 
-```tsp
-//empty user.tsp
-```
+<https://github.com/haolingdong-msft/innerloop-typespec-authoring-benchmark/tree/main/cases/ARMTemplate/002005-ARM-define-the-resource/tsp/main.tsp>
+properties: age: integer, optional; city: string, optional;profile: bytes, optional;provisioningState: enum, optional;
 
 ## Expected response
 
-
-```tsp
-import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using Http;
-using Rest;
-using Versioning;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
 
-/** Contoso Resource Provider management API. */
-@armProviderNamespace
-@service(#{ title: "ContosoManagementClient" })
-@versioned(Versions)
-namespace Microsoft.Contoso;
+namespace Microsoft.Widget;
 
-/** Contoso API versions */
-enum Versions {
-	/** 2025-12-01-preview version */
-	@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-	`2025-12-01-preview`,
-}
-
-/** A Contoso User resource. */
-model User is TrackedResource<UserProperties> {
-	...ResourceNameParameter<User>;
-}
-
-/** Properties of the Contoso User resource. */
-model UserProperties {
-	/** Display name of the user. */
-	displayName?: string;
-
-	/** Email of the user. */
-	email?: string;
-
-	/** Assigned roles for the user. */
-	roles?: string[];
-
-	/** The status of the last operation. */
-	@visibility(Lifecycle.Read)
-	provisioningState?: ProvisioningState;
-}
-
-/** The provisioning state of a resource. */
+/**
+ * Provisioning state of the Employee resource.
+ * Includes standard ARM terminal states via ResourceProvisioningState
+ * plus a custom in-progress state.
+ */
 @lroStatus
 union ProvisioningState {
-	string,
+  ResourceProvisioningState,
 
-	/** The resource create request has been accepted */
-	Accepted: "Accepted",
-
-	/** The resource is being provisioned */
-	Provisioning: "Provisioning",
-
-	/** The resource is updating */
-	Updating: "Updating",
-
-	/** Resource has been created. */
-	Succeeded: "Succeeded",
-
-	/** Resource creation failed. */
-	Failed: "Failed",
-
-	/** Resource creation was canceled. */
-	Canceled: "Canceled",
-
-	/** The resource is being deleted */
-	Deleting: "Deleting",
+  /** The resource is being provisioned. */
+  Provisioning: "Provisioning",
 }
 
-/** Operations for Contoso User resources. */
+/** Employee resource properties. */
+model EmployeeProperties {
+  /** Age of employee. */
+  age?: int32;
+
+  /** City of employee. */
+  city?: string;
+
+  /** Profile of employee. */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** An Employee resource. */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee resource operations. */
 @armResourceOperations
-interface Users {
-	/** Gets a User resource. */
-	get is ArmResourceRead<User>;
+interface Employees {
+  /** Get an Employee resource. */
+  get is ArmResourceRead<Employee>;
 
-	/** Creates or updates a User resource. */
-	createOrUpdate is ArmResourceCreateOrReplaceAsync<User>;
+  /** Create or update an Employee resource. */
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
 
-	/** Patches a User resource. */
-	update is ArmResourcePatchSync<User, UserProperties>;
+  /** Update an Employee resource. */
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      Employee,
+      EmployeeProperties
+    >
+  >;
 
-	/** Deletes a User resource. */
-	delete is ArmResourceDeleteWithoutOkAsync<User>;
+  /** Delete an Employee resource. */
+  delete is ArmResourceDeleteSync<Employee>;
 
-	/** Lists User resources in a resource group. */
-	listByResourceGroup is ArmResourceListByParent<User>;
+  /** List Employee resources by resource group. */
+  listByResourceGroup is ArmResourceListByParent<Employee>;
 
-	/** Lists User resources in a subscription. */
-	listBySubscription is ArmListBySubscription<User>;
+  /** List Employee resources by subscription. */
+  listBySubscription is ArmListBySubscription<Employee>;
 }
-
-
 ```
+
+## Verify Plan
+1. Add Employee.tsp file.
+2. Add new model Employee under the namespace "Microsoft.Widget".
+3. Add new model EmployeeProperties with 4 properties (age, city, profile, provisioningState).
+4. Add Union ProvisioningState.
+5. Add Employees interface operations: GET, PUT (async LRO), PATCH, DELETE, List by RG, List by Subscription.
 
 ## Case reference
 

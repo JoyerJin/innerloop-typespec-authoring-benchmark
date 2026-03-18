@@ -61,21 +61,6 @@ union ProvisioningState {
   string,
 }
 
-/** Employee move request */
-model MoveRequest {
-  /** The moving from location */
-  from: string;
-
-  /** The moving to location */
-  to: string;
-}
-
-/** Employee move response */
-model MoveResponse {
-  /** The status of the move */
-  movingStatus: string;
-}
-
 @armResourceOperations
 interface Employees {
   get is ArmResourceRead<Employee>;
@@ -85,7 +70,6 @@ interface Employees {
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
 }
-
 ```
 
 ### Expected output code
