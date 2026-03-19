@@ -13,6 +13,7 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "./employee.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -37,6 +38,23 @@ enum Versions {
   @previewVersion
   v2024_10_01_preview: "2024-10-01-preview",
 }
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+//employee.tsp
+import "@typespec/rest";
+import "@typespec/http";
+import "@typespec/versioning";
+import "@azure-tools/typespec-azure-core";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Rest;
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+using Azure.Core;
+using Azure.ResourceManager;
+
+namespace Microsoft.Widget;
 
 /** A Widget Employee resource */
 model Employee is TrackedResource<EmployeeProperties> {
@@ -102,8 +120,6 @@ union ProvisioningState {
 
   string,
 }
-
-interface Operations extends Azure.ResourceManager.Operations {}
 
 @armResourceOperations
 interface Employees {
@@ -191,6 +207,14 @@ model EmployeeProperties {
   provisioningState?: ProvisioningState;
 }
 ```
+
+## Verify Plan
+1. The new stable version should be added to the Versions enum, and the old preview version should be removed from the enum.
+2. The example folder should be renamed from the old preview version to the new stable version, and the api-version parameter in all example files should be updated.
+3. Preview changes that are promoted to stable should have their versioning decorators updated to reference the new stable version.
+4. The workLocation property and WorkLocation model that are excluded from stable should be deleted entirely.
+5. The oldAge property's @removed and @renamedFrom decorators should be updated to reference the new stable version.
+6. The age property's @added decorator should be updated to reference the new stable version.
 
 ## Reference
 - https://azure.github.io/typespec-azure/docs/howtos/versioning/arm/03-stable-after-preview/

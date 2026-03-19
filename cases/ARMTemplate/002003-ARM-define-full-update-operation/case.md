@@ -95,7 +95,7 @@ interface Employees {
 ```
 
 ## Verify Plan
-1. Full update operation change from ArmResourcePatchAsync to ArmCustomPatchAsync.
+1. The update operation should use the custom patch template instead of the standard resource patch template to support full resource updates.
 
 ## Case reference
 [ARM Resource Operations - Resource Update Operations (PATCH)](https://azure.github.io/typespec-azure/docs/howtos/arm/resource-operations/#resource-update-operations-patch)

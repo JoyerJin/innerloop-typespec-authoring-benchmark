@@ -67,11 +67,11 @@ interface Assets {
 ```
 
 ## Verify Plan
-1. Add asset.tsp file.
-2. Add new model Asset defined as ExtensionResource<AssetProperties> with ResourceNameParameter.
-3. Add new model AssetProperties with 4 properties (description, assetType, value and provisioningState).
-4. Add Union AssetProvisioningState.
-5. Add Asset interface operations: get, createOrUpdate (async), update (sync patch), delete (async), listByParent.
+1. A new file should be created for the Asset resource definition.
+2. The Asset model should be defined as an extension resource with its associated properties model.
+3. The Asset properties model should include description, asset type, value, and a read-only provisioning state.
+4. A provisioning state union type should be defined with standard ARM states plus custom states.
+5. The Asset interface should include standard CRUD operations and a list-by-parent operation.
 
 # Case reference
 

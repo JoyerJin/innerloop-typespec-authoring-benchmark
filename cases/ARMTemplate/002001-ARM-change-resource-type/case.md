@@ -104,14 +104,10 @@ interface Employees extends EmployeeOps<Extension.ScopeParameter> {}
 ```
 
 ## Verify Plan
-1. Model Employee changed from TrackedResource<EmployeeProperties> to ExtensionResource<EmployeeProperties>.
-2. Replace tracked-resource templates with extension-resource templates:
-- ArmResourceRead → Extension.Read
-- ArmResourceCreateOrReplaceAsync → Extension.CreateOrReplaceAsync
-- ArmResourcePatchSync → Extension.CustomPatchSync
-- ArmResourceDeleteWithoutOkAsync → Extension.DeleteWithoutOkAsync
-- ArmResourceListByParent + ArmListBySubscription → single Extension.ListByTarget
-3. Use a scope-parameterized EmployeeOps<Scope> interface with Employees extends EmployeeOps<Extension.ScopeParameter>.
+1. The Employee model should use ExtensionResource as its base type instead of TrackedResource.
+2. All CRUD operations should use the Extension resource operation templates instead of the tracked resource templates.
+3. The original separate list-by-resource-group and list-by-subscription operations should be consolidated into a single list operation using the extension list template.
+4. A scope-parameterized interface should be defined to allow the extension resource to be scoped to any parent resource.
 
 # Case reference
 

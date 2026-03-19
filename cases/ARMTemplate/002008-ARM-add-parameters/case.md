@@ -89,3 +89,6 @@ interface Employees {
 }
 ```
 
+## Verify Plan
+1. The listBySubscription operation should include top and skip query parameters for pagination support.
+2. All other existing operations in the Employees interface should remain unchanged.

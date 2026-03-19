@@ -212,5 +212,11 @@ model EmployeeProperties {
 }
 ```
 
+## Verify Plan
+1. The new preview version should be added to the Versions enum with the @previewVersion decorator, keeping all existing stable versions.
+2. A new example folder should be created for the new preview version and populated with example files.
+3. Versioning decorators referencing the previous stable version should be cleaned up since those changes are now permanently part of the stable API.
+4. The new department property should be added with an @added decorator referencing the new preview version.
+
 ## Reference
 - https://azure.github.io/typespec-azure/docs/howtos/versioning/arm/04-preview-after-stable/

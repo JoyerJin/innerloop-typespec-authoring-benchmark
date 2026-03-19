@@ -95,3 +95,6 @@ model EmployeeProperties {
   provisioningState?: ProvisioningState;
 }
 ```
+
+## Verify Plan
+1. The age property should be annotated with a decorator indicating it was made optional starting from the new preview version.

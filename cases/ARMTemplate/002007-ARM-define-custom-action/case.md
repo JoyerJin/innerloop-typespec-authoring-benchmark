@@ -127,12 +127,11 @@ interface Employees {
 ```
 
 ## Verify Plan
-1. Add new union NotificationPriority, extensible enum with Low, Normal, High, Critical.
-2. Add new model NotificationRequest with properties message: string, priority: NotificationPriority.
-3. Add new model NotificationResponse with properties notificationId: string, status: string.
-4. Add new operation in Employees interface:
-	notify is ArmResourceActionSync<Employee, NotificationRequest, NotificationResponse>;
-5. Create example files for both API versions (2021-10-01-preview, 2021-11-01).
+1. A new extensible enum should be defined for notification priority levels.
+2. A request model should be defined with message content and priority fields.
+3. A response model should be defined with notification identifier and status fields.
+4. A synchronous notify action should be added to the Employees interface as a custom POST operation.
+5. Example files should be created for all defined API versions.
 
 ## Case reference
 

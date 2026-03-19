@@ -125,6 +125,10 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 ```
 
+## Verify Plan
+1. The spread model ManagedServiceIdentityProperty should remain on the Employee model.
+2. An augment decorator should be added to mark the identity property as only available starting from the new preview version.
+
 ![alt text](image-1.png)
 
 ## Real case reference

@@ -133,10 +133,10 @@ interface Addresses {
 ```
 
 ## Verify Plan
-1. create new file address.tsp.
-2. Add new model AddressResource is ProxyResource with @parentResource(Employee) decorator.
-3. Add new model AddressProperties with 6 optional properties (street1, street2, city, state, postalCode, country) plus read-only provisioningState.
-4. Add Addresses interface operations: get, createOrUpdate (async), update (sync patch), delete (async), listByParent.
+1. A new file should be created for the Address resource definition.
+2. The AddressResource model should be defined as a proxy resource with a parent-child relationship to the Employee resource.
+3. The Address properties model should include street address fields, city, state, postal code, country, and a read-only provisioning state.
+4. The Addresses interface should include standard CRUD operations and a list-by-parent operation.
 
 ## Case reference
 

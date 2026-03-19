@@ -207,5 +207,13 @@ model EmployeeProperties {
 }
 ```
 
+## Verify Plan
+1. The new preview version should be added to the Versions enum with the @previewVersion decorator, replacing the old preview version.
+2. The example folder should be renamed from the old preview version to the new one, and the api-version parameter in all example files should be updated accordingly.
+3. The age property that was added in the previous preview should be deleted along with its @added decorator.
+4. The oldAge property that was removed in the previous preview should be restored by removing the @removed decorator.
+5. The oldAge renamedFrom decorator should be removed and the property should be reverted to its original name.
+6. The workLocation property should have its versioning decorator updated to reference the new preview version.
+
 ## Reference
 - https://azure.github.io/typespec-azure/docs/howtos/versioning/arm/02-preview-after-preview/#the-general-case-one-or-more-stable-versions-exist

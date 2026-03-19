@@ -228,5 +228,11 @@ model WorkLocation {
 }
 ```
 
+## Verify Plan
+1. The new stable version should be added to the Versions enum, keeping all existing stable versions.
+2. A new example folder should be created for the new stable version and populated with example files.
+3. The new department property should be added with an @added decorator referencing the new stable version.
+4. All existing properties and their versioning decorators from previous stable versions should remain unchanged.
+
 ## Reference
 - https://azure.github.io/typespec-azure/docs/howtos/versioning/arm/05-stable-after-stable/

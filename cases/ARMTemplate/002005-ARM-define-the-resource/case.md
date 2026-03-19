@@ -93,11 +93,11 @@ interface Employees {
 ```
 
 ## Verify Plan
-1. Add Employee.tsp file.
-2. Add new model Employee under the namespace "Microsoft.Widget".
-3. Add new model EmployeeProperties with 4 properties (age, city, profile, provisioningState).
-4. Add Union ProvisioningState.
-5. Add Employees interface operations: GET, PUT (async LRO), PATCH, DELETE, List by RG, List by Subscription.
+1. A new file should be created for the Employee resource definition.
+2. The Employee model should be defined as a tracked resource under the Microsoft.Widget namespace.
+3. The Employee properties model should include age, city, profile, and a read-only provisioning state.
+4. A provisioning state union type should be defined with standard ARM states plus custom states.
+5. The Employees interface should include standard CRUD operations and list operations by both resource group and subscription.
 
 ## Case reference
 

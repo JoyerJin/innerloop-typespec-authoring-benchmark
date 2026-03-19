@@ -103,10 +103,10 @@ interface EmployeeBadgeAssignments extends BadgeAssignmentOps<Employee> {}
 ```
 
 ## Verify Plan
-1. Define BadgeAssignment as a proper ARM extension resource attached to Employee.
-2. Replaced ArmResource* with Extension.* templates (Read, CreateOrReplaceAsync, CustomPatchAsync, DeleteWithoutOkAsync, ListByTarget) scoped to Employee.
-3. Interface pattern: Generic BadgeAssignmentOps<Scope> bound to Employee via @armResourceOperations interface EmployeeBadgeAssignments extends BadgeAssignmentOps<Employee>.
-4. Properties are unchanged.
+1. The BadgeAssignment model should be defined as an extension resource instead of a proxy resource.
+2. All operations should use the extension resource operation templates scoped to the Employee resource.
+3. A generic scope-parameterized interface should be defined, with the concrete interface bound to Employee as the target resource.
+4. The resource properties should remain unchanged from the original definition.
 
 ## Case reference
 
