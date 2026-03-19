@@ -15,28 +15,28 @@ use the native TypeSpec code generation configured in the tspconfig.yaml file.
 ```yaml
 openapi-type: arm
 openapi-subtype: rpaas
-tag: package-2021-11-01
+tag: package-2024-10-01
 ```
 
-### Tag: package-2025-05-04-preview
+### Tag: package-2024-10-01
 
-These settings apply only when `--tag=package-2025-05-04-preview` is specified on the command line.
+These settings apply only when `--tag=package-2024-10-01` is specified on the command line.
 
-```yaml $(tag) == 'package-2025-05-04-preview'
+```yaml $(tag) == 'package-2024-10-01'
 input-file:
-  - preview/2025-05-04-preview/widget.json
+  - stable/2024-10-01/widget.json
 suppressions:
   - code: PathContainsResourceType
   - code: PathResourceProviderMatchNamespace
 ```
 
-### Tag: package-2021-11-01
+### Tag: package-2021-10-01
 
-These settings apply only when `--tag=package-2021-11-01` is specified on the command line.
+These settings apply only when `--tag=package-2021-10-01` is specified on the command line.
 
-```yaml $(tag) == 'package-2021-11-01'
+```yaml $(tag) == 'package-2021-10-01'
 input-file:
-  - stable/2021-11-01/widget.json
+  - stable/2021-10-01/widget.json
 suppressions:
   - code: PathContainsResourceType
   - code: PathResourceProviderMatchNamespace
