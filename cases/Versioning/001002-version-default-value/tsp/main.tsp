@@ -2,6 +2,7 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "./employee.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -30,39 +31,4 @@ enum Versions {
   v2025_11_01: "2025-11-01",
 }
 
-/** Employee properties */
-model EmployeeProperties {
-  /** Age of employee */
-  age?: int32;
-
-  /** City of employee */
-  city?: string;
-
-  /** Profile of employee */
-  @encode("base64url")
-  profile?: bytes;
-
-  /** The status of the last operation. */
-  @visibility(Lifecycle.Read)
-  provisioningState?: ProvisioningState;
-}
-
-/** The resource provisioning state. */
-@lroStatus
-union ProvisioningState {
-  ResourceProvisioningState,
-
-  /** The resource is being provisioned */
-  Provisioning: "Provisioning",
-
-  /** The resource is updating */
-  Updating: "Updating",
-
-  /** The resource is being deleted */
-  Deleting: "Deleting",
-
-  /** The resource create request has been accepted */
-  Accepted: "Accepted",
-
-  string,
-}
+interface Operations extends Azure.ResourceManager.Operations {}

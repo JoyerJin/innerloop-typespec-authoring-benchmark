@@ -7,12 +7,15 @@ change the visibility of property 'provisioningState' from Lifecycle.Read to Lif
 ### Input Context
 
 <https://github.com/haolingdong-msft/innerloop-typespec-authoring-benchmark/blob/main/cases/Versioning/001004-version-property-decorator/tsp/main.tsp>
+<https://github.com/haolingdong-msft/innerloop-typespec-authoring-benchmark/blob/main/cases/Versioning/001004-version-property-decorator/tsp/employee.tsp>
 
 ```tsp
+//main.tsp
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "./employee.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -39,6 +42,26 @@ enum Versions {
   /** 2025-05-04-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2025-05-04-preview`,
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+//employee.tsp
+import "@typespec/rest";
+import "@typespec/http";
+import "@azure-tools/typespec-azure-core";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Rest;
+using TypeSpec.Http;
+using Azure.Core;
+using Azure.ResourceManager;
+
+namespace Microsoft.Widget;
+
+/** Employee resource */
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
 }
 
 /** Employee properties */
@@ -76,6 +99,16 @@ union ProvisioningState {
   Accepted: "Accepted",
 
   string,
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+  delete is ArmResourceDeleteWithoutOkAsync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
 }
 ```
 

@@ -1,3 +1,4 @@
+import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
@@ -25,44 +26,9 @@ enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_11_01: "2021-11-01",
 
-  /** 2025-11-01 version */
+  /** 2025-05-01 version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2025_11_01: "2025-11-01",
+  v2025_05_01: "2025-05-01",
 }
 
-/** Employee properties */
-model EmployeeProperties {
-  /** Age of employee */
-  age: int32;
-
-  /** City of employee */
-  city?: string;
-
-  /** Profile of employee */
-  @encode("base64url")
-  profile?: bytes;
-
-  /** The status of the last operation. */
-  @visibility(Lifecycle.Read)
-  provisioningState?: ProvisioningState;
-}
-
-/** The resource provisioning state. */
-@lroStatus
-union ProvisioningState {
-  ResourceProvisioningState,
-
-  /** The resource is being provisioned */
-  Provisioning: "Provisioning",
-
-  /** The resource is updating */
-  Updating: "Updating",
-
-  /** The resource is being deleted */
-  Deleting: "Deleting",
-
-  /** The resource create request has been accepted */
-  Accepted: "Accepted",
-
-  string,
-}
+interface Operations extends Azure.ResourceManager.Operations {}

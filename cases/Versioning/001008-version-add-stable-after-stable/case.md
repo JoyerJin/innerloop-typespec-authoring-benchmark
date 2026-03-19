@@ -7,12 +7,15 @@ Add a new stable version `2025-01-01` to my service. In this new version, I want
 ### Input Context
 
 <https://github.com/haolingdong-msft/innerloop-typespec-authoring-benchmark/blob/main/cases/Versioning/001008-version-add-stable-after-stable/tsp/main.tsp>
+<https://github.com/haolingdong-msft/innerloop-typespec-authoring-benchmark/blob/main/cases/Versioning/001008-version-add-stable-after-stable/tsp/employee.tsp>
 
 ```tsp
+//main.tsp
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "./employee.tsp";
 
 using TypeSpec.Http;
 using TypeSpec.Rest;
@@ -36,6 +39,23 @@ enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2024_10_01: "2024-10-01",
 }
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+//employee.tsp
+import "@typespec/rest";
+import "@typespec/http";
+import "@typespec/versioning";
+import "@azure-tools/typespec-azure-core";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using TypeSpec.Rest;
+using TypeSpec.Http;
+using TypeSpec.Versioning;
+using Azure.Core;
+using Azure.ResourceManager;
+
+namespace Microsoft.Widget;
 
 /** A Widget Employee resource */
 model Employee is TrackedResource<EmployeeProperties> {
@@ -101,8 +121,6 @@ union ProvisioningState {
 
   string,
 }
-
-interface Operations extends Azure.ResourceManager.Operations {}
 
 @armResourceOperations
 interface Employees {

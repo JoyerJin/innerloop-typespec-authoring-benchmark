@@ -1,14 +1,3 @@
-# CASE 001003-version-required-to-optional
-
-## prompt
-
-change the property age of EmployeeProperties from required to optional for new api version 2025-05-04-preview
-
-### Input Context
-
-<https://github.com/haolingdong-msft/innerloop-typespec-authoring-benchmark/blob/main/cases/Versioning/001003-version-required-to-optional/tsp/employee.tsp>
-
-```tsp
 import "@typespec/rest";
 import "@typespec/http";
 import "@azure-tools/typespec-azure-core";
@@ -72,26 +61,3 @@ interface Employees {
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
 }
-```
-
-## answer
-
-```tsp
-/** Employee properties */
-model EmployeeProperties {
-  /** Age of employee */
-  @madeOptional(Microsoft.Widget.Versions.`2025-05-04-preview`)
-  age?: int32;
-
-  /** City of employee */
-  city?: string;
-
-  /** Profile of employee */
-  @encode("base64url")
-  profile?: bytes;
-
-  /** The status of the last operation. */
-  @visibility(Lifecycle.Read)
-  provisioningState?: ProvisioningState;
-}
-```
